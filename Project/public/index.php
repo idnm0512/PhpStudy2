@@ -1,10 +1,13 @@
 <?php
+    use \Hanbit\EntryPoint;
+    use \Ijdb\IjdbRoutes;
+
     try {
         include __DIR__ . '/../includes/autoload.php';
 
         $route = ltrim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
 
-        $entryPoint = new \Hanbit\EntryPoint($route, new \Ijdb\IjdbRoutes(), $_SERVER['REQUEST_METHOD']);
+        $entryPoint = new EntryPoint($route, new IjdbRoutes(), $_SERVER['REQUEST_METHOD']);
 
         $entryPoint -> run();
     } catch (PDOException $e) {

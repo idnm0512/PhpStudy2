@@ -2,15 +2,17 @@
     namespace Ijdb;
 
     use \Hanbit\DatabaseTable;
+    use \Hanbit\Routes;
+    use \Ijdb\Controllers\Joke;
 
-    class IjdbRoutes implements \Hanbit\Routes {
+    class IjdbRoutes implements Routes {
         public function getRoutes() {
             include __DIR__ . '/../../includes/DatabaseConnection.php';
 
             $jokesTable = new DatabaseTable($pdo, 'joke', 'id');
             $authorsTable = new DatabaseTable($pdo, 'author', 'id');
             
-            $jokeController = new \Ijdb\Controllers\Joke($jokesTable, $authorsTable);
+            $jokeController = new Joke($jokesTable, $authorsTable);
 
             $routes = [
                 'joke/edit' => [

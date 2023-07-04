@@ -1,12 +1,14 @@
 <?php
     namespace Hanbit;
 
+    use \Hanbit\Routes;
+
     class EntryPoint {
         private $route;
         private $routes;
         private $method;
 
-        public function __construct(string $route, \Hanbit\Routes $routes, string $method) {
+        public function __construct(string $route, Routes $routes, string $method) {
             $this -> route = $route;
             $this -> routes = $routes;
             $this -> method = $method;
