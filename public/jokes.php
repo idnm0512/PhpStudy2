@@ -1,13 +1,13 @@
 <?php
     try {
-        $pdo = new PDO('mysql:host=localhost;dbname=ijdb;charset=utf8', 'ijdbuser', '1234');
-        $pdo -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        include __DIR__ . '/../includes/DatabaseConnection.php';
+        include __DIR__ . '/../includes/DatabaseFunctions.php';
 
-        $sql = 'SELECT `id`, `joketext` FROM `joke`';
-
-        $jokes = $pdo -> query($sql);
+        $jokes = allJokes($pdo);
 
         $title = '유머 글 목록';
+
+        $totalJokes = totalJokes($pdo);
 
         ob_start();
 
