@@ -1,18 +1,10 @@
 <?php
     if (isset($_POST['joketext'])) {
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=ijdb;charset=utf8', 'ijdbuser', '1234');
-            $pdo -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-            $sql = 'INSERT INTO `joke` SET
-                `joketext` = :joketext,
-                `jokedate` = CURDATE()';
+            include __DIR__ . '/../includes/DatabaseConnection.php';
+            include __DIR__ . '/../includes/DatabaseFunctions.php';
 
-            $stmt = $pdo -> prepare($sql);
-
-            $stmt -> bindValue(':joketext', $_POST['joketext']);
-
-            $stmt -> execute();
+            insertJoke($pdo, $_POST['joketext'], 1);
 
             header('location: jokes.php');
         } catch (PDOException $e) {
