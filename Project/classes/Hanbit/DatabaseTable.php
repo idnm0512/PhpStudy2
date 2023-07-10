@@ -5,11 +5,16 @@
         private $pdo;
         private $table;
         private $primaryKey;
+        private $className;
+        private $constructorArgs;
 
-        public function __construct(\PDO $pdo, string $table, string $primaryKey) {
+        public function __construct(\PDO $pdo, string $table, string $primaryKey,
+                                        string $className = '\stdClass', array $constructorArgs = []) {
             $this -> pdo = $pdo;
             $this -> table = $table;
             $this -> primaryKey = $primaryKey;
+            $this -> className = $className;
+            $this -> constructorArgs = $constructorArgs;
         }
 
         private function query($sql, $parameters = []) {
@@ -41,7 +46,7 @@
         public function findAll() {
             $result = $this -> query('SELECT * FROM `' . $this -> table . '`');
     
-            return $result -> fetchAll();
+            return $result -> fetchAll(\PDO::FETCH_CLASS, $this -> className, $this -> constructorArgs);
         }
     
         public function findById($value) {
@@ -53,7 +58,7 @@
     
             $query = $this -> query($query, $parameters);
     
-            return $query -> fetch();
+            return $query -> fetchObject($this -> className, $this -> constructorArgs);
         }
 
         public function find($column, $value) {
@@ -65,19 +70,31 @@
 
             $query = $this -> query($query, $parameters);
 
-            return $query -> fetchAll();
+            return $query -> fetchAll(\PDO::FETCH_CLASS, $this -> className, $this -> constructorArgs);
         }
     
         public function save($record) {
+            $entity = new $this -> className(...$this -> constructorArgs);
+
             try {
                 if ($record[$this -> primaryKey] == '') {
                     $record[$this -> primaryKey] = null;
                 }
     
-                $this -> insert($record);
+                $insertId = $this -> insert($record);
+
+                $entity -> {$this -> primaryKey} = $insertId;
             } catch (\PDOException $e) {
                 $this -> update($record);
             }
+
+            foreach ($record as $key => $value) {
+                if (!empty($value)) {
+                    $entity -> $key = $value;
+                }
+            }
+
+            return $entity;
         }
     
         private function insert($fields) {
@@ -100,6 +117,8 @@
             $fields = $this -> processDates($fields);
     
             $this -> query($query, $fields);
+
+            return $this -> pdo -> lastInsertId();
         }
     
         private function update($fields) {
@@ -126,6 +145,16 @@
                 ':id' => $id
             ];
     
+            $this -> query($query, $parameters);
+        }
+
+        public function deleteWhere($column, $value) {
+            $query = 'DELETE FROM `' . $this -> table . '` WHERE `' . $column . '` = :value';
+
+            $parameters = [
+                ':value' => $value
+            ];
+
             $this -> query($query, $parameters);
         }
     }
