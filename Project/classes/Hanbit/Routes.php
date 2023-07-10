@@ -6,4 +6,5 @@
     interface Routes {
         public function getRoutes(): Array;
         public function getAuthentication(): Authentication;
+        public function checkPermission($permission): bool;
     }
